@@ -26,6 +26,20 @@ pipeline {
                 }
             }
         }
+        stage('JaCoCo') {
+            steps {
+                sh 'mvn -B jacoco:report'
+                archiveArtifacts artifacts: 'target/site/jacoco/**', fingerprint: true
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target/site/jacoco',
+                    reportFiles: 'index.html',
+                    reportName: 'JaCoCo Coverage Report'
+                ])
+            }
+        }
         stage('Archive') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true

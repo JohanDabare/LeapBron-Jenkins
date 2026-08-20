@@ -10,6 +10,12 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Quality Check') {
+            steps {
+                sh 'mvn checkstyle:check'
+                sh 'mvn spotbugs:check'
+            }
+        }
         stage('Build') {
             steps {
                 

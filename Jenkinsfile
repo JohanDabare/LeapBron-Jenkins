@@ -10,6 +10,11 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Code Quality') {
+            steps {
+                sh 'mvn -B checkstyle:check'
+            }
+        }
         stage('Build') {
             steps {
                 

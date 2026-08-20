@@ -12,11 +12,16 @@ pipeline {
         }
         stage('Quality Check') {
             steps {
+                sh 'mvn -B checkstyle:checkstyle'
+                echo 'Checkstyle HTML report generated at target/site/checkstyle.html'
                 sh 'mvn -e checkstyle:check'
-               
                 sh 'mvn -B spotbugs:check'
-               
                 echo 'Quality check completed successfully.'
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'target/site/checkstyle.html', allowEmptyArchive: true
+                }
             }
         }
         stage('Build') {

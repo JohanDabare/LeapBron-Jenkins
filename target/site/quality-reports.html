@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sprint1-demo-app – Quality Reports</title>
+    <link rel="stylesheet" href="./css/maven-base.css" />
+    <link rel="stylesheet" href="./css/maven-theme.css" />
+    <link rel="stylesheet" href="./css/site.css" />
+    <link rel="stylesheet" href="./css/print.css" media="print" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="composite">
+    <div id="banner">
+      <div id="bannerLeft">sprint1-demo-app</div>
+      <div class="clear"><hr/></div>
+    </div>
+    <div id="breadcrumbs">
+      <div class="xleft">
+        <span id="publishDate">Last Published: 2026-08-20</span>
+        | <span id="projectVersion">Version: 0.1.0</span>
+      </div>
+      <div class="xright"><a href="#" title="sprint1-demo-app">sprint1-demo-app</a></div>
+      <div class="clear"><hr/></div>
+    </div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+        <h5>Documentation</h5>
+        <ul>
+          <li class="none"><a href="index.html" title="Home">Home</a></li>
+          <li class="none"><a href="dependencies.html" title="Dependencies">Dependencies</a></li>
+          <li class="none"><a href="plugins.html" title="Plugins">Plugins</a></li>
+          <li class="none"><strong>Quality Reports</strong></li>
+        </ul>
+        <a href="http://maven.apache.org/" title="Built by Maven" class="poweredBy">
+          <img class="poweredBy" alt="Built by Maven" src="./images/logos/maven-feather.png" />
+        </a>
+      </div>
+    </div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        <section>
+          <a name="Quality_Reports"></a>
+          <h2 class="text-3xl font-bold mb-2">Quality Reports</h2>
+          <p class="text-gray-700 mb-8">Code quality analysis results from SpotBugs and Checkstyle tools.</p>
+
+          <h3 class="text-2xl font-bold mt-8 mb-4">Summary</h3>
+          <div id="summary" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+          <h3 class="text-2xl font-bold mt-8 mb-4">SpotBugs Findings</h3>
+          <div id="spotbugs-section" class="overflow-x-auto"></div>
+
+          <h3 class="text-2xl font-bold mt-8 mb-4">Checkstyle Violations</h3>
+          <div id="checkstyle-section" class="overflow-x-auto"></div>
+        </section>
+      </div>
+    </div>
+    <div class="clear"><hr/></div>
+    <div id="footer">
+      <div class="xright">Copyright &#169; 2026..</div>
+      <div class="clear"><hr/></div>
+    </div>
+
+    <script>
+      async function loadReports() {
+        try {
+          const spotbugsData = await fetch('../spotbugsXml.xml').then(r => r.text());
+          const checkstyleData = await fetch('../checkstyle-result.xml').then(r => r.text());
+
+          const spotbugsXml = new DOMParser().parseFromString(spotbugsData, 'application/xml');
+          const checkstyleXml = new DOMParser().parseFromString(checkstyleData, 'application/xml');
+
+          renderSummary(spotbugsXml, checkstyleXml);
+          renderSpotbugs(spotbugsXml);
+          renderCheckstyle(checkstyleXml);
+        } catch (error) {
+          document.getElementById('summary').innerHTML = '<p style="color: red;">Error loading reports: ' + error.message + '</p>';
+        }
+      }
+
+      function renderSummary(spotbugsXml, checkstyleXml) {
+        const bugs = spotbugsXml.querySelectorAll('BugInstance').length;
+        const errors = checkstyleXml.querySelectorAll('error').length;
+        
+        const summary = `
+          <div class="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="text-4xl font-bold text-red-600">${bugs}</div>
+            <div class="text-gray-700 font-semibold mt-2">SpotBugs Issues Found</div>
+          </div>
+          <div class="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="text-4xl font-bold text-green-600">${errors}</div>
+            <div class="text-gray-700 font-semibold mt-2">Checkstyle Violations Found</div>
+          </div>
+        `;
+        document.getElementById('summary').innerHTML = summary;
+      }
+
+      function renderSpotbugs(xml) {
+        const bugs = xml.querySelectorAll('BugInstance');
+        
+        if (bugs.length === 0) {
+          document.getElementById('spotbugs-section').innerHTML = '<div class="py-8 text-center text-green-600 font-semibold text-lg">✓ No issues found</div>';
+          return;
+        }
+
+        let html = '<table class="w-full border-collapse"><thead><tr class="bg-gray-100 border-b-2 border-gray-300"><th class="text-left px-4 py-3 font-semibold text-gray-800">Type</th><th class="text-left px-4 py-3 font-semibold text-gray-800">Severity</th><th class="text-left px-4 py-3 font-semibold text-gray-800">File / Lines</th><th class="text-left px-4 py-3 font-semibold text-gray-800">Description</th></tr></thead><tbody>';
+        
+        bugs.forEach((bug, idx) => {
+          const type = bug.getAttribute('type') || 'Unknown';
+          const abbrev = bug.getAttribute('abbrev') || 'N/A';
+          const priority = parseInt(bug.getAttribute('priority')) || 3;
+          const severity = priority === 1 ? 'High' : priority === 2 ? 'Medium' : 'Low';
+          
+          // Prioritize Method-level SourceLineAnnotation for more precise line info
+          let sourceLineGroup = bug.querySelector('Method SourceLine');
+          if (!sourceLineGroup) {
+            // Fall back to Class-level SourceLineAnnotation
+            sourceLineGroup = bug.querySelector('Class SourceLine');
+          }
+          
+          const file = sourceLineGroup ? sourceLineGroup.getAttribute('sourcefile') : 'N/A';
+          const startLine = sourceLineGroup ? sourceLineGroup.getAttribute('start') : 'N/A';
+          const endLine = sourceLineGroup ? sourceLineGroup.getAttribute('end') : null;
+          
+          // Display line range (e.g., "14-16") or single line
+          const lineRange = (startLine !== 'N/A' && endLine && startLine !== endLine) 
+            ? `${startLine}-${endLine}` 
+            : startLine;
+          
+          const shortMessage = bug.querySelector('ShortMessage');
+          const desc = shortMessage ? shortMessage.textContent : type;
+          
+          const severityClass = priority === 1 ? 'text-red-600 font-bold' : priority === 2 ? 'text-yellow-600 font-semibold' : 'text-blue-600';
+          const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+          
+          html += `<tr class="${rowBg} border-b border-gray-200 hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-3">${abbrev}</td>
+            <td class="px-4 py-3"><span class="${severityClass}">${severity}</span></td>
+            <td class="px-4 py-3 text-gray-600 font-mono text-sm">${file}:${lineRange}</td>
+            <td class="px-4 py-3 text-gray-700">${desc}</td>
+          </tr>`;
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('spotbugs-section').innerHTML = html;
+      }
+
+      function renderCheckstyle(xml) {
+        const files = xml.querySelectorAll('file');
+        let allErrors = [];
+        
+        // Iterate through each file element and collect all errors with filename info
+        files.forEach(fileElement => {
+          const fullPath = fileElement.getAttribute('name') || 'Unknown.java';
+          // Extract just the filename from full Windows path
+          const filename = fullPath.includes('\\') ? fullPath.split('\\').pop() : fullPath.split('/').pop();
+          
+          const errors = fileElement.querySelectorAll('error');
+          errors.forEach(error => {
+            allErrors.push({
+              filename: filename,
+              message: error.getAttribute('message') || 'Unknown',
+              severity: error.getAttribute('severity') || 'warning',
+              line: error.getAttribute('line') || 'N/A',
+              column: error.getAttribute('column'),
+              source: error.getAttribute('source') || 'N/A'
+            });
+          });
+        });
+        
+        if (allErrors.length === 0) {
+          document.getElementById('checkstyle-section').innerHTML = '<div class="py-8 text-center text-green-600 font-semibold text-lg">✓ No violations found</div>';
+          return;
+        }
+
+        let html = '<table class="w-full border-collapse"><thead><tr class="bg-gray-100 border-b-2 border-gray-300"><th class="text-left px-4 py-3 font-semibold text-gray-800">Message</th><th class="text-left px-4 py-3 font-semibold text-gray-800">Severity</th><th class="text-left px-4 py-3 font-semibold text-gray-800">File / Position</th><th class="text-left px-4 py-3 font-semibold text-gray-800">Source</th></tr></thead><tbody>';
+        
+        allErrors.forEach((error, idx) => {
+          // Display line:column if column exists, otherwise just line
+          const position = error.column ? `${error.line}:${error.column}` : error.line;
+          const filePosition = `${error.filename}:${position}`;
+          
+          const severityClass = error.severity === 'error' ? 'text-red-600 font-bold' : error.severity === 'warning' ? 'text-yellow-600 font-semibold' : 'text-blue-600';
+          const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+          
+          html += `<tr class="${rowBg} border-b border-gray-200 hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-3 text-gray-700">${error.message}</td>
+            <td class="px-4 py-3"><span class="${severityClass}">${error.severity}</span></td>
+            <td class="px-4 py-3 text-gray-600 font-mono text-sm">${filePosition}</td>
+            <td class="px-4 py-3 text-gray-600 text-sm">${error.source}</td>
+          </tr>`;
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('checkstyle-section').innerHTML = html;
+      }
+
+      loadReports();
+    </script>
+  </body>
+</html>

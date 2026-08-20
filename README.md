@@ -1,55 +1,66 @@
-# Module 10 Lab — Introduction to Jenkins
+# Going Further — Extending Your Jenkins Pipeline
 
-## Objectives
+Finished early? Here are some ways to extend the pipeline you just fixed. Pick whichever looks
+most interesting — you don't need to do all of them. They build roughly in order of difficulty,
+and most of them add directly onto your existing `Jenkinsfile` and `pom.xml`.
 
-By the end of this lab you will have:
+If you get stuck, [`solutions/Jenkinsfile_GoingFurther`](solutions/Jenkinsfile_GoingFurther) shows
+one way of combining several of these together — but try it yourself first.
 
-- Navigated the Jenkins UI: dashboard, job page, build page, console output
-- Run an existing pipeline and read its result
-- Diagnosed a deliberately broken pipeline stage, using GenAI as a first port of call
-- Fixed the break and confirmed the pipeline goes green
+## 1. Add a code coverage stage
 
-## Setup
+Report how much of the code your tests actually exercise.
 
-- Access to the Sprint 1 Jenkins instance
-- Your own Pipeline job in Jenkins, pointing at your own copy of the
-  [`starter/`](starter) project from this lab, pushed to your GitHub repository from Module 08
-- GitHub Copilot Chat available in IntelliJ
+**Hints:** the JaCoCo Maven plugin is the standard tool for this — it needs adding to the
+`<plugins>` section of `pom.xml` and bound to run around the `test` phase. Once it's producing a
+report under `target/site/jacoco`, add a new pipeline stage that runs it and archives the output
+(`archiveArtifacts` works fine if you just want the HTML report saved; the HTML Publisher plugin
+gives you a nicer in-Jenkins view if it's installed on your instance).
 
-## Task sheet
+## 2. Add a static analysis stage
 
-### Part A — Run it and find the break
+Catch style or quality issues automatically instead of relying on code review.
 
-1. Copy `starter/` into your own repository (or a new one), push it to GitHub, and create a
-   Jenkins Pipeline job pointing at it. Ask your trainer if you're unsure how to create the job.
-2. Click **Build Now** and watch the stage view.
-3. Once the build finishes, open **Console Output** and find the error. Note down the exact
-   error message and which stage it occurred in.
+**Hints:** `maven-checkstyle-plugin` or `spotbugs-maven-plugin` are both straightforward to bolt
+onto this project. Add the plugin to `pom.xml`, then add a stage that runs its `check` goal. Think
+about whether you want the build to fail on violations or just report them — that changes what
+Maven goal/config you reach for.
 
-### Part B — Diagnose with GenAI
+## 3. Run stages in parallel
 
-4. Open the `Jenkinsfile` in IntelliJ. Select the `Test` stage and, in Copilot Chat, ask it to
-   explain the error message you found and suggest the most likely cause. Remember: this is
-   still a learning-aid prompt, ask it to explain, not to fix the file for you.
-5. Critique the explanation: does it match what you know about how Maven Surefire works? Check
-   for yourself by running `mvn test` locally and looking at what actually gets created under
-   `target/`.
+Once you have a second stage alongside `Test` (coverage or static analysis), run them side by
+side instead of one after another.
 
-### Part C — Fix it and confirm
+**Hints:** look at the `parallel` step — it takes a map of named branches, each with its own
+`steps`. Both branches need the code already built, so this only makes sense *after* your `Build`
+stage, not instead of it.
 
-6. Based on your diagnosis, edit the `Jenkinsfile` yourself to fix the broken step.
-7. Commit and push the fix.
-8. Run the Jenkins job again and confirm it now succeeds. Open Console Output once more and
-   confirm the Test stage now reports passing tests, and the Archive stage runs.
+## 4. Add a manual approval gate
 
-## Acceptance criteria
+Pause the pipeline before `Archive` and require a human to click "proceed."
 
-- You can state the exact error message the broken pipeline produced, and which stage it came
-  from.
-- You have a short written note (a few sentences) on what GenAI told you the error meant, and
-  whether you confirmed it was accurate.
-- Your fixed pipeline shows a green (successful) build in Jenkins, with the Test stage
-  reporting passing tests and the Archive stage completing.
+**Hints:** the `input` step is what you want. Think about where in the stage order it belongs, and
+what happens if nobody responds — an unattended `input` step will hold a Jenkins executor open
+indefinitely unless you wrap it in a `timeout`.
 
-If you finish early, compare your fix with a partner's, did you phrase your Copilot prompt the
-same way? Did you get the same explanation?
+## 5. Parameterize the build
+
+Let whoever triggers the build choose something — e.g. whether to skip tests, or which
+environment a build is "for."
+
+**Hints:** a `parameters {}` block at the top of the pipeline (try `booleanParam` or `choice`)
+defines what shows up on the "Build with Parameters" screen. You can then read `params.X` in a
+`when { expression { ... } }` block on a stage to make it conditional. One gotcha: Jenkins only
+shows the parameters form *after* the pipeline has run once with the `parameters` block in place —
+the first run after adding it won't prompt you.
+
+## 6. Stretch: extract a Jenkins Shared Library
+
+Move reusable pipeline logic (e.g. your test or notification steps) out into its own versioned
+library that any Jenkinsfile can call into.
+
+**Hints:** this needs a *second* git repository, with pipeline code under a `vars/` directory
+following Jenkins' naming convention. You register it under **Manage Jenkins > System > Global
+Pipeline Libraries**, then reference it from your Jenkinsfile with `@Library('your-lib-name') _`
+at the top. This is the most involved option here — budget accordingly, and expect to need your
+trainer's help wiring up the library in Jenkins.

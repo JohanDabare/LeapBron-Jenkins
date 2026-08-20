@@ -44,6 +44,14 @@ pipeline {
             post {
                 always {
                     archiveArtifacts artifacts: 'target/site/quality-report.html, target/site/checkstyle.html, target/site/spotbugs.html', fingerprint: true
+                    publishHTML([
+                        reportDir: 'target/site',
+                        reportFiles: 'quality-report.html',
+                        reportName: 'Code Quality Report',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true,
+                        allowMissing: false
+                    ])
                 }
             }
         }

@@ -41,6 +41,7 @@
      <li class="expanded"><a href="project-reports.html" title="Project Reports">Project Reports</a>
       <ul>
        <li class="none"><strong>Checkstyle</strong></li>
+       <li class="none"><a href="spotbugs.html" title="SpotBugs">SpotBugs</a></li>
       </ul></li>
     </ul>
       <a href="http://maven.apache.org/" title="Built by Maven" class="poweredBy">
@@ -64,7 +65,7 @@
 <td>1</td>
 <td>0</td>
 <td>0</td>
-<td>4</td></tr></table></section><section><a name="Files"></a>
+<td>11</td></tr></table></section><section><a name="Files"></a>
 <h3><a name="Files"></a>Files</h3>
 <table border="0" class="bodyTable">
 <tr class="a">
@@ -76,7 +77,7 @@
 <td><a href="#com.2Fneueda.2Fleap.2FGreeter.java">com/neueda/leap/Greeter.java</a></td>
 <td>0</td>
 <td>0</td>
-<td>4</td></tr></table></section><section><a name="Rules"></a>
+<td>11</td></tr></table></section><section><a name="Rules"></a>
 <h3><a name="Rules"></a>Rules</h3>
 <table border="0" class="bodyTable">
 <tr class="a">
@@ -87,7 +88,7 @@
 <tr class="b">
 <td>design</td>
 <td><a class="externalLink" href="https://checkstyle.org/checks/design/designforextension.html">DesignForExtension</a></td>
-<td>1</td>
+<td>2</td>
 <td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td></tr>
 <tr class="a">
 <td>javadoc</td>
@@ -97,12 +98,19 @@
 <tr class="b">
 <td></td>
 <td><a class="externalLink" href="https://checkstyle.org/checks/javadoc/missingjavadocmethod.html">MissingJavadocMethod</a></td>
-<td>1</td>
+<td>2</td>
 <td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td></tr>
 <tr class="a">
 <td>misc</td>
 <td><a class="externalLink" href="https://checkstyle.org/checks/misc/finalparameters.html">FinalParameters</a></td>
-<td>1</td>
+<td>3</td>
+<td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td></tr>
+<tr class="b">
+<td>sizes</td>
+<td><a class="externalLink" href="https://checkstyle.org/checks/sizes/linelength.html">LineLength</a>
+<ul>
+<li>fileExtensions: <code>&quot;java&quot;</code></li></ul></td>
+<td>3</td>
 <td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td></tr></table></section><section><a name="Details"></a>
 <h3><a name="Details"></a>Details</h3><section><a name="comneuedaleapGreeter.java"></a>
 <h4><a name="com.2Fneueda.2Fleap.2FGreeter.java"></a>com/neueda/leap/Greeter.java</h4>
@@ -124,19 +132,61 @@
 <td>design</td>
 <td>DesignForExtension</td>
 <td>Class 'Greeter' looks like designed for extension (can be subclassed), but the method 'greet' does not have javadoc that explains how to do that safely. If class is not designed for extension consider making the class 'Greeter' final or making the method 'greet' static/final/abstract/empty, or adding allowed annotation for the method.</td>
-<td>4</td></tr>
+<td>8</td></tr>
 <tr class="b">
 <td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
 <td>javadoc</td>
 <td>MissingJavadocMethod</td>
 <td>Missing a Javadoc comment.</td>
-<td>4</td></tr>
+<td>8</td></tr>
 <tr class="a">
 <td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
 <td>misc</td>
 <td>FinalParameters</td>
 <td>Parameter name should be final.</td>
-<td>4</td></tr></table></section></section></section>
+<td>8</td></tr>
+<tr class="b">
+<td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
+<td>sizes</td>
+<td>LineLength</td>
+<td>Line is longer than 80 characters (found 91).</td>
+<td>12</td></tr>
+<tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
+<td>design</td>
+<td>DesignForExtension</td>
+<td>Class 'Greeter' looks like designed for extension (can be subclassed), but the method 'getUserByUsername' does not have javadoc that explains how to do that safely. If class is not designed for extension consider making the class 'Greeter' final or making the method 'getUserByUsername' static/final/abstract/empty, or adding allowed annotation for the method.</td>
+<td>12</td></tr>
+<tr class="b">
+<td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
+<td>javadoc</td>
+<td>MissingJavadocMethod</td>
+<td>Missing a Javadoc comment.</td>
+<td>12</td></tr>
+<tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
+<td>misc</td>
+<td>FinalParameters</td>
+<td>Parameter conn should be final.</td>
+<td>12</td></tr>
+<tr class="b">
+<td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
+<td>misc</td>
+<td>FinalParameters</td>
+<td>Parameter username should be final.</td>
+<td>12</td></tr>
+<tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
+<td>sizes</td>
+<td>LineLength</td>
+<td>Line is longer than 80 characters (found 83).</td>
+<td>13</td></tr>
+<tr class="b">
+<td><img src="images/icon_error_sml.gif" alt="" />&#160;Error</td>
+<td>sizes</td>
+<td>LineLength</td>
+<td>Line is longer than 80 characters (found 81).</td>
+<td>14</td></tr></table></section></section></section>
       </div>
     </div>
     <div class="clear">

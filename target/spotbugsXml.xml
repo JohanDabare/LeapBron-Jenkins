@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BugCollection sequence='0' release='' analysisTimestamp='1787240504398' version='4.10.3' timestamp='1787240208226'><Project projectName='sprint1-demo-app'><Jar>C:\Users\Administrator\Desktop\LeapBron-Jenkins\LeapBron-Jenkins\target\classes</Jar><SrcDir>C:\Users\Administrator\Desktop\LeapBron-Jenkins\LeapBron-Jenkins\src\main\java</SrcDir><WrkDir>C:\Users\Administrator\Desktop\LeapBron-Jenkins\LeapBron-Jenkins\target</WrkDir></Project><BugInstance instanceOccurrenceNum='0' instanceHash='33870af63e84343e6c275a175d4c118e' rank='20' abbrev='OBL' category='EXPERIMENTAL' priority='2' type='OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE' instanceOccurrenceMax='0'><ShortMessage>Method may fail to clean up stream or resource on checked exception</ShortMessage><LongMessage>com.neueda.leap.Greeter.getUserByUsername(Connection, String) may fail to clean up java.sql.Statement on checked exception</LongMessage><Class classname='com.neueda.leap.Greeter' primary='true'><SourceLine classname='com.neueda.leap.Greeter' start='7' end='16' sourcepath='com/neueda/leap/Greeter.java' sourcefile='Greeter.java'><Message>At Greeter.java:[lines 7-16]</Message></SourceLine><Message>In class com.neueda.leap.Greeter</Message></Class><Method isStatic='false' classname='com.neueda.leap.Greeter' signature='(Ljava/sql/Connection;Ljava/lang/String;)Ljava/sql/ResultSet;' name='getUserByUsername' primary='true'><SourceLine endBytecode='113' classname='com.neueda.leap.Greeter' start='14' end='16' sourcepath='com/neueda/leap/Greeter.java' sourcefile='Greeter.java' startBytecode='0'></SourceLine><Message>In method com.neueda.leap.Greeter.getUserByUsername(Connection, String)</Message></Method><Class role='CLASS_REFTYPE' classname='java.sql.Statement'><SourceLine classname='java.sql.Statement' start='1096' end='1647' sourcepath='java/sql/Statement.java' sourcefile='Statement.java'><Message>At Statement.java:[lines 1096-1647]</Message></SourceLine><Message>Reference type java.sql.Statement</Message></Class><Int role='INT_OBLIGATIONS_REMAINING' value='1'><Message>1 instances of obligation remaining</Message></Int><SourceLine role='SOURCE_LINE_OBLIGATION_CREATED' endBytecode='8' classname='com.neueda.leap.Greeter' start='15' end='15' sourcepath='com/neueda/leap/Greeter.java' sourcefile='Greeter.java' startBytecode='8' primary='true'><Message>Obligation to clean up resource created at Greeter.java:[line 15] is not discharged</Message></SourceLine><SourceLine role='SOURCE_LINE_PATH_CONTINUES' endBytecode='15' classname='com.neueda.leap.Greeter' start='16' end='16' sourcepath='com/neueda/leap/Greeter.java' sourcefile='Greeter.java' startBytecode='15'><Message>Path continues at Greeter.java:[line 16]</Message></SourceLine><String role='STRING_REMAINING_OBLIGATIONS' value='{Statement x 1}'><Message>Remaining obligations: {Statement x 1}</Message></String></BugInstance><BugInstance instanceOccurrenceNum='0' instanceHash='884a8e173b16fe2e6ab8669f38c2537d' cweid='89' rank='10' abbrev='SQL' category='SECURITY' priority='1' type='SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE' instanceOccurrenceMax='0'><ShortMessage>Nonconstant string passed to execute or addBatch method on an SQL statement</ShortMessage><LongMessage>com.neueda.leap.Greeter.getUserByUsername(Connection, String) passes a nonconstant String to an execute or addBatch method on an SQL statement</LongMessage><Class classname='com.neueda.leap.Greeter' primary='true'><SourceLine classname='com.neueda.leap.Greeter' start='7' end='16' sourcepath='com/neueda/leap/Greeter.java' sourcefile='Greeter.java'><Message>At Greeter.java:[lines 7-16]</Message></SourceLine><Message>In class com.neueda.leap.Greeter</Message></Class><Method isStatic='false' classname='com.neueda.leap.Greeter' signature='(Ljava/sql/Connection;Ljava/lang/String;)Ljava/sql/ResultSet;' name='getUserByUsername' primary='true'><SourceLine endBytecode='9' classname='com.neueda.leap.Greeter' start='14' end='16' sourcepath='com/neueda/leap/Greeter.java' sourcefile='Greeter.java' startBytecode='0'></SourceLine><Message>In method com.neueda.leap.Greeter.getUserByUsername(Connection, String)</Message></Method><SourceLine endBytecode='18' classname='com.neueda.leap.Greeter' start='16' end='16' sourcepath='com/neueda/leap/Greeter.java' sourcefile='Greeter.java' startBytecode='18' primary='true'><Message>At Greeter.java:[line 16]</Message></SourceLine></BugInstance><BugCategory category='SECURITY'><Description>Security</Description></BugCategory><BugCategory category='EXPERIMENTAL'><Description>Experimental</Description></BugCategory><BugPattern cweid='89' abbrev='SQL' category='SECURITY' type='SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE'><ShortDescription>Nonconstant string passed to execute or addBatch method on an SQL statement</ShortDescription><Details>
+
+  &lt;p&gt;The method invokes the execute or addBatch method on an SQL statement with a String that seems
+to be dynamically generated. Consider using
+a prepared statement instead. It is more efficient and less vulnerable to
+SQL injection attacks.
+&lt;/p&gt;
+&lt;p&gt;See &lt;a href="https://cwe.mitre.org/data/definitions/89.html"&gt;CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')&lt;/a&gt;.
+&lt;/p&gt;
+
+    </Details></BugPattern><BugPattern abbrev='OBL' category='EXPERIMENTAL' type='OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE'><ShortDescription>Method may fail to clean up stream or resource on checked exception</ShortDescription><Details>
+          
+          &lt;p&gt;
+          This method may fail to clean up (close, dispose of) a stream,
+          database object, or other
+          resource requiring an explicit cleanup operation.
+          &lt;/p&gt;
+
+          &lt;p&gt;
+          In general, if a method opens a stream or other resource,
+          the method should use a try/finally block to ensure that
+          the stream or resource is cleaned up before the method
+          returns.
+          &lt;/p&gt;
+
+          &lt;p&gt;
+          This bug pattern is essentially the same as the
+          OS_OPEN_STREAM and ODR_OPEN_DATABASE_RESOURCE
+          bug patterns, but is based on a different
+          (and hopefully better) static analysis technique.
+          We are interested is getting feedback about the
+          usefulness of this bug pattern.
+          For sending feedback, check:
+          &lt;/p&gt;
+          &lt;ul&gt;
+            &lt;li&gt;&lt;a href="https://github.com/spotbugs/spotbugs/blob/master/.github/CONTRIBUTING.md"&gt;contributing guideline&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="https://github.com/spotbugs/discuss/issues?q="&gt;mailinglist&lt;/a&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+
+          &lt;p&gt;
+          In particular,
+          the false-positive suppression heuristics for this
+          bug pattern have not been extensively tuned, so
+          reports about false positives are helpful to us.
+          &lt;/p&gt;
+
+          &lt;p&gt;
+          See Weimer and Necula, &lt;i&gt;Finding and Preventing Run-Time Error Handling Mistakes&lt;/i&gt;
+          (&lt;a href="https://people.eecs.berkeley.edu/~necula/Papers/rte_oopsla04.pdf"&gt;PDF&lt;/a&gt;),
+          for a description of the analysis technique.
+          &lt;/p&gt;
+          
+      </Details></BugPattern><BugCode abbrev='OBL'><Description>Unsatisfied obligation to clean up stream or resource</Description></BugCode><BugCode abbrev='SQL'><Description>Potential SQL Problem</Description></BugCode><Errors missingClasses='0' errors='0'></Errors><FindBugsSummary num_packages='1' total_classes='1' priority_1='1' priority_2='1' total_size='9' clock_seconds='1.96' referenced_classes='24' vm_version='25.0.3+9-LTS' total_bugs='2' java_version='25.0.3' gc_seconds='0.01' alloc_mbytes='512.00' cpu_seconds='5.88' peak_mbytes='170.16' timestamp='Thu, 20 Aug 2026 15:36:48 +0000'><FileStats path='com/neueda/leap/Greeter.java' size='9' bugHash='0b3a726b5da857495d07e1be69e568af' bugCount='2'></FileStats><PackageStats package='com.neueda.leap' priority_1='1' total_bugs='2' priority_2='1' total_size='9' total_types='1'><ClassStats bugs='2' size='9' priority_1='1' priority_2='1' interface='false' sourceFile='Greeter.java' class='com.neueda.leap.Greeter'></ClassStats></PackageStats><FindBugsProfile><ClassProfile avgMicrosecondsPerInvocation='934' totalMilliseconds='480' name='edu.umd.cs.findbugs.classfile.engine.ClassInfoAnalysisEngine' maxMicrosecondsPerInvocation='29669' standardDeviationMicrosecondsPerInvocation='2384' invocations='514'></ClassProfile><ClassProfile avgMicrosecondsPerInvocation='340' totalMilliseconds='175' name='edu.umd.cs.findbugs.classfile.engine.ClassDataAnalysisEngine' maxMicrosecondsPerInvocation='8235' standardDeviationMicrosecondsPerInvocation='585' invocations='516'></ClassProfile><ClassProfile avgMicrosecondsPerInvocation='4285' totalMilliseconds='102' name='edu.umd.cs.findbugs.detect.FieldItemSummary' maxMicrosecondsPerInvocation='18857' standardDeviationMicrosecondsPerInvocation='5427' invocations='24'></ClassProfile><ClassProfile avgMicrosecondsPerInvocation='596' totalMilliseconds='66' name='edu.umd.cs.findbugs.OpcodeStack$JumpInfoFactory' maxMicrosecondsPerInvocation='4065' standardDeviationMicrosecondsPerInvocation='817' invocations='112'></ClassProfile><ClassProfile avgMicrosecondsPerInvocation='2698' totalMilliseconds='64' name='edu.umd.cs.findbugs.detect.FindNoSideEffectMethods' maxMicrosecondsPerInvocation='13445' standardDeviationMicrosecondsPerInvocation='3312' invocations='24'></ClassProfile><ClassProfile avgMicrosecondsPerInvocation='993' totalMilliseconds='54' name='edu.umd.cs.findbugs.classfile.engine.bcel.JavaClassAnalysisEngine' maxMicrosecondsPerInvocation='23794' standardDeviationMicrosecondsPerInvocation='3260' invocations='55'></ClassProfile><ClassProfile avgMicrosecondsPerInvocation='112' totalMilliseconds='52' name='edu.umd.cs.findbugs.util.TopologicalSort' maxMicrosecondsPerInvocation='10349' standardDeviationMicrosecondsPerInvocation='527' invocations='472'></ClassProfile><ClassProfile avgMicrosecondsPerInvocation='11021' totalMilliseconds='33' name='edu.umd.cs.findbugs.classfile.engine.bcel.MethodGenFactory' maxMicrosecondsPerInvocation='31996' standardDeviationMicrosecondsPerInvocation='14832' invocations='3'></ClassProfile><ClassProfile avgMicrosecondsPerInvocation='1339' totalMilliseconds='32' name='edu.umd.cs.findbugs.detect.NoteDirectlyRelevantTypeQualifiers' maxMicrosecondsPerInvocation='3928' standardDeviationMicrosecondsPerInvocation='1319' invocations='24'></ClassProfile></FindBugsProfile></FindBugsSummary><ClassFeatures></ClassFeatures><History></History></BugCollection>

@@ -10,24 +10,23 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Build') {
+            steps {
+                sh 'mvn -B clean package'
+            }
+        }
         stage('Quality Check') {
             steps {
                 sh 'mvn -B site'
-                echo 'Checkstyle HTML report generated at target/site/checkstyle.html'
+                echo 'Checkstyle and SpotBugs HTML reports generated.'
                 sh 'mvn -e checkstyle:check'
                 sh 'mvn -B spotbugs:check'
                 echo 'Quality check completed successfully.'
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'target/site/checkstyle.html', fingerprint: true
+                    archiveArtifacts artifacts: 'target/site/checkstyle.html, target/site/spotbugs.html', fingerprint: true
                 }
-            }
-        }
-        stage('Build') {
-            steps {
-                
-                sh 'mvn -B clean package'
             }
         }
         stage('Test') {

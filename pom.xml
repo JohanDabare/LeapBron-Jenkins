@@ -58,6 +58,15 @@
                     <consoleOutput>true</consoleOutput>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.10.3.0</version>
+                <configuration>
+                    <effort>more</effort>
+                    <threshold>low</threshold>
+                </configuration>
+            </plugin>
         </plugins>
     </reporting>
 </project>

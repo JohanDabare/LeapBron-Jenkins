@@ -30,7 +30,9 @@ pipeline {
                                 body { font-family: Arial, sans-serif; margin: 24px; color: #222; }
                                 h1 { margin-bottom: 8px; }
                                 section { margin-top: 24px; }
-                                iframe { width: 100%; height: 650px; border: 1px solid #ccc; }
+                                table { border-collapse: collapse; width: 100%; margin-bottom: 24px; }
+                                th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+                                th { background: #f0f0f0; }
                             </style>
                         </head>
                         <body>
@@ -38,15 +40,13 @@ pipeline {
                             <p>This page combines the Checkstyle and SpotBugs results.</p>
                             <section>
                                 <h2>Checkstyle</h2>
-                                <iframe src="checkstyle.html" title="Checkstyle results"></iframe>
-                            </section>
-                            <section>
-                                <h2>SpotBugs</h2>
-                                <iframe src="spotbugs.html" title="SpotBugs results"></iframe>
-                            </section>
-                        </body>
-                        </html>
+                                <p>The following section contains the Checkstyle findings.</p>
+                                <div id="checkstyle-results">
                         EOF
+                        awk '/<body[^>]*>/{inside=1; sub(/^.*<body[^>]*>/, "");} /<\/body>/{sub(/<\/body>.*/, ""); print; inside=0; exit} inside{print}' target/site/checkstyle.html >> target/site/quality-report.html
+                        printf '</div></section><section><h2>SpotBugs</h2><p>The following section contains the SpotBugs findings.</p><div id="spotbugs-results">\n' >> target/site/quality-report.html
+                        awk '/<body[^>]*>/{inside=1; sub(/^.*<body[^>]*>/, "");} /<\/body>/{sub(/<\/body>.*/, ""); print; inside=0; exit} inside{print}' target/site/spotbugs.html >> target/site/quality-report.html
+                        printf '</div></section></body></html>\n' >> target/site/quality-report.html
                     '''.stripIndent())
                     def checkstyleStatus = sh(returnStatus: true, script: 'mvn -e checkstyle:check')
                     def spotbugsStatus = sh(returnStatus: true, script: 'mvn -B spotbugs:check')

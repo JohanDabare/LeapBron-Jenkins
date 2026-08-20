@@ -17,15 +17,55 @@ pipeline {
         }
         stage('Quality Check') {
             steps {
-                sh 'mvn -B site'
-                echo 'Checkstyle and SpotBugs HTML reports generated.'
-                sh 'mvn -e checkstyle:check'
-                sh 'mvn -B spotbugs:check'
-                echo 'Quality check completed successfully.'
+                script {
+                    def siteStatus = sh(returnStatus: true, script: 'mvn -B site')
+                    def dashboardStatus = sh(returnStatus: true, script: '''
+                        cat > target/site/quality-report.html <<'EOF'
+                        <!doctype html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>Code Quality Report</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 24px; color: #222; }
+                                h1 { margin-bottom: 8px; }
+                                section { margin-top: 24px; }
+                                iframe { width: 100%; height: 650px; border: 1px solid #ccc; }
+                            </style>
+                        </head>
+                        <body>
+                            <h1>Code Quality Report</h1>
+                            <p>This page combines the Checkstyle and SpotBugs results.</p>
+                            <section>
+                                <h2>Checkstyle</h2>
+                                <iframe src="checkstyle.html" title="Checkstyle results"></iframe>
+                            </section>
+                            <section>
+                                <h2>SpotBugs</h2>
+                                <iframe src="spotbugs.html" title="SpotBugs results"></iframe>
+                            </section>
+                        </body>
+                        </html>
+                        EOF
+                    '''.stripIndent())
+                    def checkstyleStatus = sh(returnStatus: true, script: 'mvn -e checkstyle:check')
+                    def spotbugsStatus = sh(returnStatus: true, script: 'mvn -B spotbugs:check')
+
+                    echo "Report generation exit code: ${siteStatus}"
+                    echo "Combined report exit code: ${dashboardStatus}"
+                    echo "Checkstyle exit code: ${checkstyleStatus}"
+                    echo "SpotBugs exit code: ${spotbugsStatus}"
+
+                    if (siteStatus != 0 || dashboardStatus != 0 || checkstyleStatus != 0 || spotbugsStatus != 0) {
+                        error 'Quality checks failed. See the archived HTML reports for details.'
+                    }
+
+                    echo 'Quality check completed successfully.'
+                }
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'target/site/checkstyle.html, target/site/spotbugs.html', fingerprint: true
+                    archiveArtifacts artifacts: 'target/site/quality-report.html, target/site/checkstyle.html, target/site/spotbugs.html', fingerprint: true
                 }
             }
         }

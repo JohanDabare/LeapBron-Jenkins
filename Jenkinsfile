@@ -14,6 +14,7 @@ pipeline {
             steps {
                 sh 'mvn -B checkstyle:check'
                 sh 'mvn -B spotbugs:check'
+                echo 'Quality check completed successfully.'
             }
         }
         stage('Build') {

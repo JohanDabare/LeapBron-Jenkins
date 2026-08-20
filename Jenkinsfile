@@ -12,7 +12,7 @@ pipeline {
         }
         stage('Quality Check') {
             steps {
-                sh 'mvn -B checkstyle:checkstyle'
+                sh 'mvn -B site'
                 echo 'Checkstyle HTML report generated at target/site/checkstyle.html'
                 sh 'mvn -e checkstyle:check'
                 sh 'mvn -B spotbugs:check'
@@ -20,7 +20,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'target/site/checkstyle.html', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'target/site/checkstyle.html', fingerprint: true
                 }
             }
         }

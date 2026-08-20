@@ -12,10 +12,10 @@ pipeline {
         }
         stage('Quality Check') {
             steps {
-                sh 'mvn -B checkstyle:check'
-                sh 'mvn checkstyle:check -Dcheckstyle.consoleOutput=true'
+                sh 'mvn -X checkstyle:check'
+               
                 sh 'mvn -B spotbugs:check'
-                sh 'mvn spotbugs:spotbugs'
+               
                 echo 'Quality check completed successfully.'
             }
         }

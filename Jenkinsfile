@@ -43,9 +43,9 @@ pipeline {
                                 <p>The following section contains the Checkstyle findings.</p>
                                 <div id="checkstyle-results">
                         EOF
-                        awk '/<body[^>]*>/{inside=1; sub(/^.*<body[^>]*>/, "");} /<\/body>/{sub(/<\/body>.*/, ""); print; inside=0; exit} inside{print}' target/site/checkstyle.html >> target/site/quality-report.html
+                        awk 'index($0, "<body") {inside=1; next} index($0, "</body>") {exit} inside {print}' target/site/checkstyle.html >> target/site/quality-report.html
                         printf '</div></section><section><h2>SpotBugs</h2><p>The following section contains the SpotBugs findings.</p><div id="spotbugs-results">\n' >> target/site/quality-report.html
-                        awk '/<body[^>]*>/{inside=1; sub(/^.*<body[^>]*>/, "");} /<\/body>/{sub(/<\/body>.*/, ""); print; inside=0; exit} inside{print}' target/site/spotbugs.html >> target/site/quality-report.html
+                        awk 'index($0, "<body") {inside=1; next} index($0, "</body>") {exit} inside {print}' target/site/spotbugs.html >> target/site/quality-report.html
                         printf '</div></section></body></html>\n' >> target/site/quality-report.html
                     '''.stripIndent())
                     def checkstyleStatus = sh(returnStatus: true, script: 'mvn -e checkstyle:check')

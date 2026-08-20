@@ -12,8 +12,8 @@ pipeline {
         }
         stage('Quality Check') {
             steps {
-                sh 'mvn checkstyle:check'
-                sh 'mvn spotbugs:check'
+                sh 'mvn -B checkstyle:check'
+                sh 'mvn -B spotbugs:check'
             }
         }
         stage('Build') {
